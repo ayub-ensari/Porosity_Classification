@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[90]:
+# In[13]:
 
 
 import sys
@@ -14,28 +14,24 @@ import regex as re
 from matplotlib import pyplot as plt
 import matplotlib
 import pandas as pd
-import tensorflow as tf
 import cv2
 import numpy as np
-import seaborn as sns
-import sklearn 
-import keras
 
 
-# The "pipreqs" generates a puthon packages requirements text file based on the imports in the current jupyter notebook.
+# > The "pipreqs" generates a puthon packages requirements text file based on the imports in the current jupyter notebook.
 # 
-# The required packages could be installed at once using pip and requirements.txt file
+# > The required packages could be installed at once using pip and requirements.txt file
 
-# In[99]:
+# In[10]:
 
 
 get_ipython().system('pip install pipreqs')
 get_ipython().system('pip install nbconvert')
 
 
-# So what we’ve done here is converted our notebook into a .py file in a new directory called reqs, then run pipreqs in the new directory. The reason for this is that pipreqs only works on .py files and I can’t seem to get it to work when there are other files in the folder. The requirements.txt will be generated in the same folder.
+# > So what we’ve done here is converted our notebook into a .py file in a new directory called reqs, then run pipreqs in the new directory. The reason for this is that pipreqs only works on .py files and I can’t seem to get it to work when there are other files in the folder. The requirements.txt will be generated in the same folder.
 
-# In[103]:
+# In[12]:
 
 
 get_ipython().system('jupyter nbconvert --output-dir="./reqs" --to script 1_Data_Collection.ipynb')
@@ -43,13 +39,13 @@ get_ipython().system('cd reqs')
 get_ipython().system('pipreqs --force')
 
 
-# In[104]:
+# In[4]:
 
 
 get_ipython().system('pip install -r requirements.txt')
 
 
-# In[105]:
+# In[5]:
 
 
 # Python version
@@ -68,15 +64,15 @@ print('tensorflow: {}'.format(tf.__version__))
 
 # ## Define functions - Read Images
 # 
-# The load_all_image_path function read all the files in the given directory and return a list of all file's path and the labels. Labels are merely the name of the image file on hard-drive. An example of files is
+# >The load_all_image_path function read all the files in the given directory and return a list of all file's path and the labels. Labels are merely the name of the image file on hard-drive. An example of files is
 # 
-# './Build2\\2020-03-08_13-14-42_layer_02955.jpg',
+# > './Build2\\2020-03-08_13-14-42_layer_02955.jpg',
 # 
-# Whereas, a label is
+# > Whereas, a label is
 # 
-# '2020-03-08_13-14-42_layer_02955.jpg',
+# > '2020-03-08_13-14-42_layer_02955.jpg',
 
-# In[20]:
+# In[6]:
 
 
 def load_all_image_path(img_dir):
@@ -92,19 +88,19 @@ def load_all_image_path(img_dir):
 
 
 # ## Loading Images
-# Read all the directorries in the given folder. It returns images paths and their labels.
+# > Read all the directorries in the given folder. It returns images paths and their labels.
 # 
-# __img_dir_paths__ = All Image's directory path/address.
+# > __img_dir_paths__ = All Image's directory path/address.
 # <br>
 # __img_names__ = All Image's names.
 
-# In[44]:
+# In[7]:
 
 
 img_dir_paths, img_names = load_all_image_path("D:/UoH_PhD_Exp/Data/Build2")
 
 
-# In[45]:
+# In[8]:
 
 
 def var_info(var):
@@ -114,9 +110,9 @@ var_info(img_dir_paths)
 var_info(img_names)
 
 
-# Since out of all the images the first 1250 layers/images are relevant to our builts. That's why only the first 1250 are considered. For B1 and B2, the effective printing layers are 244-1242 and for B3 219-1217. But for simplicity, uniformity and avoiding complexity, first 1250 layers are selected.
+# > Since out of all the images the first 1250 layers/images are relevant to our builts. That's why only the first 1250 are considered. For B1 and B2, the effective printing layers are 244-1242 and for B3 219-1217. But for simplicity, uniformity and avoiding complexity, first 1250 layers are selected.
 
-# In[46]:
+# In[9]:
 
 
 img_dir_paths = img_dir_paths[0:1250]
@@ -127,8 +123,11 @@ print(len(img_names))
 
 # ### Layers with porosity
 # #### Old Labels
+# 
+# > Followig are the index numbers of porosity images from three cylinders, B1, B2 & B3. The old labels were based on the CAD file
+# information. Whereas, XCT analysis of cylinders revealed that some images were wrongly labelled as pores. The new labels remove the wrong image indexes.
 
-# In[30]:
+# In[26]:
 
 
 b1_prosity_index = list(range(311,380)) + list(range(537, 554)) + list(range(628, 663)) + list(range(832, 862)) + list(range(936, 937)) + list(range(940, 953)) + list(range(1011, 1078)) + list(range(1145, 1152))
@@ -138,7 +137,7 @@ b3_prosity_index = list(range(420,456)) + list(range(519, 546)) + list(range(619
 
 # #### New Labels
 
-# In[31]:
+# In[27]:
 
 
 b1_remove_index = [311,312,313,318,320,325,326,335,340,366,369,374,375,376,537,538,539,540,541,542,543,544,545,546,547,
@@ -157,45 +156,27 @@ b3_remove_index = [420,423,425,436,439,442,449,453,519,521,522,533,534,538,541,5
                       630,631,632,721,723,724,727,728,729,733,735,819,820,821,822,826,919,920,921,922]
 
 
-# In[32]:
+# In[28]:
 
 
 b1_prosity_index = [x for x in b1_prosity_index if x not in b1_remove_index]
-print(b1_prosity_index[0:10])
-print(len(b1_prosity_index))
-
-
-# In[33]:
-
-
+print("Number of porosity images in B1 Cylinder: ",len(b1_prosity_index), "\n")
 print(b1_prosity_index)
 
 
-# In[34]:
+# In[29]:
 
 
 b2_prosity_index = [x for x in b2_prosity_index if x not in b2_remove_index]
-print(b2_prosity_index[0:10])
-print(len(b2_prosity_index))
-
-
-# In[35]:
-
-
+print("Number of porosity images in B2 Cylinder: ",len(b2_prosity_index), "\n")
 print(b2_prosity_index)
 
 
-# In[36]:
+# In[30]:
 
 
 b3_prosity_index = [x for x in b3_prosity_index if x not in b3_remove_index]
-print(b3_prosity_index[0:10])
-print(len(b3_prosity_index))
-
-
-# In[37]:
-
-
+print("Number of porosity images in B3 Cylinder: ",len(b3_prosity_index), "\n")
 print(b3_prosity_index)
 
 
@@ -203,10 +184,13 @@ print(b3_prosity_index)
 
 # > The following function receives a chunk of image's path and their corresponding labels. Not all the images in Build2 are relevant to our cylinders. Out of total 2922 images, only 963 images relevant to our 3d objects. Three cylinders names as B1, B2, B3 were printed. Images from 243 to 1243 are related to B1 and B2 cylinders. Whereas, B3 cylinder related images are ranges from 218 to 1218. 
 # <br><br><br>
-# Firstly, the images were read into a numpy array called imgs_data. The image dimensions are __height = 2600 and Width = 1420__. Each image is then cropped into three small sections. __Height=1250-1440 and width=650-1100__ is firstly croped from the whole powder bed image.  <br> <br>
+# Firstly, the images were read into a numpy array. The image dimensions are __height = 2600 and Width = 1420__. Each image is then cropped into three small sections. __Height=1250-1440 and width=650-1100__ is firstly croped from the whole powder bed image.  <br> <br>
 # The cropped image is further is divided into three parts, each containg the image of a cylinder[B1,B2,B3]. The coordinates of __B1=[h:0-190, w:0-150]__, __B2 = [h:0-190, w:150-300]__ , __B3 = [h:0-190, w:300-450]__. The three images were then stored in different folders on the hard-drive.  
 
-# In[38]:
+# > The __crop_save_images__ function read images from hard drive and crop out B1, B2, and B3 cylinders into individual images. It also labels the images. The label consisted of 
+# __label = Porosity_flag +  cylinder name + layer number__ 
+
+# In[31]:
 
 
 def crop_save_images(files, directory, labels):
@@ -268,7 +252,10 @@ def crop_save_images(files, directory, labels):
         #break
 
 
-# In[72]:
+# > The __crop_save_images_with_poreSize__ function is exactly the saem as crop_save_images function except it also add the pore sizeinformation to the image's label. 
+# __label = Porosity_flag +  cylinder name + layer number + Pore Size__ 
+
+# In[32]:
 
 
 def crop_save_images_with_poreSize(files, directory, labels):
@@ -363,9 +350,9 @@ def crop_save_images_with_poreSize(files, directory, labels):
         #break
 
 
-# Since out of all the images the first 1250 layers/images are relevant to our builts. That's why only the first 1250 are considered. For B1 and B2, the effective printing layers are 244-1242 and for B3 219-1217. But for simplicity, uniformity and avoiding complexity, first 1250 layers are selected.
+# > The cropped images are stored separately on B1, B2 and B3 directories on hard drive. The following code insure that the directories exsists. If not already exsists, it will create these folders.
 
-# In[49]:
+# In[33]:
 
 
 directories = ["D:/UoH_PhD_Exp/Data/Crop_images/B1/", "D:/UoH_PhD_Exp/Data/Crop_images/B2/", "D:/UoH_PhD_Exp/Data/Crop_images/B3/"]
@@ -376,8 +363,9 @@ for directory in directories:
 
 
 # #### Remove all the old files in B1, B2 & B3 folder
+# > Since we will be cropping images many times depedning upon the task at hand. Therefore, it is necessary to delete the old cropped images before saving the new cropped images. The following code empty the directories.
 
-# In[56]:
+# In[34]:
 
 
 for directory in directories:
@@ -388,7 +376,7 @@ for directory in directories:
 
 # #### Cropping images
 
-# In[57]:
+# In[35]:
 
 
 crop_save_images(img_dir_paths[217:1206] ,directories, img_names[217:1206]) 
@@ -397,7 +385,7 @@ crop_save_images(img_dir_paths[217:1206] ,directories, img_names[217:1206])
 # ##  Loading cropped images
 # ### B1 Images
 
-# In[64]:
+# In[36]:
 
 
 files, labels = load_all_image_path("D:/UoH_PhD_Exp/Data/Crop_images/B1/")
@@ -424,7 +412,7 @@ print(unique, counts)
 print(b1_images.shape)
 
 
-# In[66]:
+# In[37]:
 
 
 files, labels = load_all_image_path("D:/UoH_PhD_Exp/Data/Crop_images/B2/")
@@ -448,7 +436,7 @@ print(unique, counts)
 print(b2_images.shape)
 
 
-# In[67]:
+# In[38]:
 
 
 files, labels = load_all_image_path("D:/UoH_PhD_Exp/Data/Crop_images/B3")
@@ -476,7 +464,7 @@ print(b3_images.shape)
 # 
 # X = Images     y = Image labels
 
-# In[71]:
+# In[39]:
 
 
 X = np.concatenate((b1_images, b2_images, b3_images), axis=0)
